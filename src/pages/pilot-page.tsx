@@ -32,18 +32,22 @@ const dronePilots: Pilot[] = [
     { id: 4, name: "Emily Brown", location: "Houston", rating: 4.6, specialties: ["Agriculture", "Thermal Imaging"], imageUrl: "/placeholder.svg" },
     { id: 5, name: "David Lee", location: "Miami", rating: 4.9, specialties: ["Event Coverage", "3D Modeling"], imageUrl: "/placeholder.svg" },
     { id: 6, name: "Sarah Wilson", location: "Seattle", rating: 4.8, specialties: ["Search and Rescue", "Wildlife Monitoring"], imageUrl: "/placeholder.svg" },
+    { id: 7, name: "Thomas Müller", location: "Dobl-Zwaring", rating: 3.9, specialties: ["3D Modeling", "Aerial Photography"], imageUrl: "/placeholder.svg" },
+    { id: 8, name: "Lukas Hofer", location: "St. Stefan ob Stainz", rating: 5.0, specialties: ["Search and Rescue", "Cinematography"], imageUrl: "/placeholder.svg" },
+    { id: 9, name: "Paul Vallant", location: "Straßgang", rating: 4.2, specialties: ["Thermal Imaging", "3D Modeling"], imageUrl: "/placeholder.svg" },
+    { id: 10, name: "Andreas Schrotter", location: "Hitzendorf", rating: 4.3, specialties: ["Agriculture", "Wildlife Monitoring"], imageUrl: "/placeholder.svg" },
 ];
 
 const PilotPage = () => {
 
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
+    const [selectedSpecialty, setSelectedSpecialty] = useState<string>("all");
     const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
     const [bookingDate, setBookingDate] = useState<Date | undefined>(undefined); // Change here
 
     const filteredPilots = dronePilots.filter(pilot =>
         pilot.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedSpecialty === "" || pilot.specialties.includes(selectedSpecialty))
+        (selectedSpecialty === "all" || pilot.specialties.includes(selectedSpecialty))
     );
 
     return (
@@ -119,19 +123,19 @@ const PilotPage = () => {
                                     <DialogTrigger asChild>
                                         <Button className="w-full" onClick={() => setSelectedPilot(pilot)}>Book Now</Button>
                                     </DialogTrigger>
-                                    <DialogContent>
+                                    <DialogContent className={"w-1/4 mx-auto"}>
                                         <DialogHeader>
                                             <DialogTitle>Book {selectedPilot?.name}</DialogTitle>
                                             <DialogDescription>
                                                 Select a date to book this drone pilot for your project.
                                             </DialogDescription>
                                         </DialogHeader>
-                                        <div className="py-4">
+                                        <div className="py-4 mx-auto">
                                             <Calendar
                                                 mode="single"
                                                 selected={bookingDate}
-                                                onSelect={(date) => setBookingDate(date)} // Change here
-                                                className="rounded-md border"
+                                                onSelect={(date) => setBookingDate(date)}
+                                                className="rounded-md border border-gray-300 shadow-lg p-4"
                                             />
                                         </div>
                                         <DialogFooter>
