@@ -32,6 +32,10 @@ const dronePilots: Pilot[] = [
     { id: 4, name: "Emily Brown", location: "Houston", rating: 4.6, specialties: ["Agriculture", "Thermal Imaging"], imageUrl: "/placeholder.svg" },
     { id: 5, name: "David Lee", location: "Miami", rating: 4.9, specialties: ["Event Coverage", "3D Modeling"], imageUrl: "/placeholder.svg" },
     { id: 6, name: "Sarah Wilson", location: "Seattle", rating: 4.8, specialties: ["Search and Rescue", "Wildlife Monitoring"], imageUrl: "/placeholder.svg" },
+    { id: 7, name: "Thomas Müller", location: "Dobl-Zwaring", rating: 3.9, specialties: ["3D Modeling", "Aerial Photography"], imageUrl: "/placeholder.svg" },
+    { id: 8, name: "Lukas Hofer", location: "St. Stefan ob Stainz", rating: 5.0, specialties: ["Search and Rescue", "Cinematography"], imageUrl: "/placeholder.svg" },
+    { id: 9, name: "Paul Vallant", location: "Straßgang", rating: 4.2, specialties: ["Thermal Imaging", "3D Modeling"], imageUrl: "/placeholder.svg" },
+    { id: 10, name: "Andreas Schrotter", location: "Hitzendorf", rating: 4.3, specialties: ["Agriculture", "Wildlife Monitoring"], imageUrl: "/placeholder.svg" },
 ];
 
 const PilotPage = () => {
