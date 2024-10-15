@@ -37,13 +37,13 @@ const dronePilots: Pilot[] = [
 const PilotPage = () => {
 
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
+    const [selectedSpecialty, setSelectedSpecialty] = useState<string>("all");
     const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
     const [bookingDate, setBookingDate] = useState<Date | undefined>(undefined); // Change here
 
     const filteredPilots = dronePilots.filter(pilot =>
         pilot.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedSpecialty === "" || pilot.specialties.includes(selectedSpecialty))
+        (selectedSpecialty === "all" || pilot.specialties.includes(selectedSpecialty))
     );
 
     return (
@@ -119,19 +119,19 @@ const PilotPage = () => {
                                     <DialogTrigger asChild>
                                         <Button className="w-full" onClick={() => setSelectedPilot(pilot)}>Book Now</Button>
                                     </DialogTrigger>
-                                    <DialogContent>
+                                    <DialogContent className={"w-1/4 mx-auto"}>
                                         <DialogHeader>
                                             <DialogTitle>Book {selectedPilot?.name}</DialogTitle>
                                             <DialogDescription>
                                                 Select a date to book this drone pilot for your project.
                                             </DialogDescription>
                                         </DialogHeader>
-                                        <div className="py-4">
+                                        <div className="py-4 mx-auto">
                                             <Calendar
                                                 mode="single"
                                                 selected={bookingDate}
-                                                onSelect={(date) => setBookingDate(date)} // Change here
-                                                className="rounded-md border"
+                                                onSelect={(date) => setBookingDate(date)}
+                                                className="rounded-md border border-gray-300 shadow-lg p-4"
                                             />
                                         </div>
                                         <DialogFooter>
