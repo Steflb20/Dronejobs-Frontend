@@ -55,7 +55,7 @@ const PilotPage = () => {
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold">Dronejobs</span>
+                        <span className="text-xl font-bold" data-testid="cypress-title">Dronejobs</span>
                     </div>
                     <Button variant="ghost" className="flex items-center space-x-2">
                         <User className="h-5 w-5" />
@@ -73,7 +73,7 @@ const PilotPage = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="flex-grow"
                     />
-                    <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
+                    <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty} >
                         <SelectTrigger className="w-[200px]">
                             <SelectValue placeholder="Select specialty" />
                         </SelectTrigger>
