@@ -1,20 +1,22 @@
 pipeline {
     agent any
-
     stages {
-        stage('Test') {
+        stage('Build') {
             steps {
-                sh 'echo test'
+                sh 'npm install'
             }
         }
-    }
 
-    post {
-        success {
-            echo 'Build and Deploy succeeded!'
+        stage('Test') {
+            steps {
+                sh 'npm run test'
+            }
         }
-        failure {
-            echo 'Build or Deploy failed!'
+
+        stage('E2E') {
+            steps {
+                sh "npx cypress run"
+            }
         }
     }
 }
