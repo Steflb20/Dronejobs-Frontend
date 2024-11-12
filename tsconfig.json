@@ -1,33 +1,21 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "types": ["cypress"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "target": "es6",
+    "module": "commonjs",
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src"
-  ]
+    "cypress/**/*.ts",       // Include all TypeScript files in the Cypress folder
+    "cypress.config.js",     // Include the Cypress configuration file
+    "src/**/*.ts"           // Include all TypeScript files in your source directory (if needed)
+  ],
+  "files": [
+    "cypress/**/*.ts",       // Include all TypeScript files in the Cypress folder
+    "cypress.config.js",     // Include the Cypress configuration file
+    "src/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }
