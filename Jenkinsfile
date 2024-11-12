@@ -7,7 +7,7 @@ pipeline {
                 sh 'echo test'
             }
         }
-
+    }
 
     post {
         success {
