@@ -13,9 +13,10 @@ pipeline {
             }
         }
 
-        stage('E2E') {
+        stage("Deploy") {
             steps {
-                sh "npx cypress run"
+                sh "rm /var/www/virtual/kadrone1/html/*"
+                sh "mv build/* /var/www/virtual/kadrone1/html/"
             }
         }
     }
