@@ -2,7 +2,7 @@ import * as cypress from "cypress";
 
 describe('PilotPage', () => {
   beforeEach(() => {
-    cy.visit("http://web:3000", { retryOnNetworkFailure: true });
+    cy.visit("http://localhost:3000/", { retryOnNetworkFailure: true });
   });
 
   it('displays the title', () => {

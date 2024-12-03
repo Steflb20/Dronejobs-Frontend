@@ -12,8 +12,6 @@ interface ExtendedCustomComponents extends Partial<CustomComponents> {
     IconRight?: (props: { [x: string]: any }) => JSX.Element;
 }
 
-
-
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 const components: ExtendedCustomComponents = {
