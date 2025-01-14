@@ -5,6 +5,10 @@ pipeline {
         nodejs 'NODE23'
     }
 
+    environment {
+        CI=false
+    }
+
     stages {
         stage('Install Dependencies') {
             steps {
