@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 describe('PilotPage', () => {
     beforeEach(() => {
-        cy.visit('http://localhost:3000');
+        cy.visit('http://127.0.0.1:3000');
     });
     it('displays the title', () => {
         cy.get('[data-testid="cypress-title"]').should('contain', 'Dronejobs');
