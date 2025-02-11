@@ -18,7 +18,7 @@ import {
     DialogTrigger
 } from "../components/shadcn/dialog";
 import { Calendar } from "../components/shadcn/calendar";
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { Label } from "../components/shadcn/label";
 import { format } from 'date-fns';
 
@@ -71,6 +71,16 @@ const PilotPage = () => {
     const [pilotToDelete, setPilotToDelete] = useState<Pilot | null>(null);
     const [isBookingsDialogOpen, setIsBookingsDialogOpen] = useState(false);
     const [selectedPilotBookings, setSelectedPilotBookings] = useState<Pilot | null>(null);
+
+    useEffect(() => {
+        if (bookingConfirmation) {
+            const timer = setTimeout(() => {
+                setBookingConfirmation(null);
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [bookingConfirmation]);
 
     const filteredPilots = dronePilots.filter(pilot =>
         pilot.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -257,7 +267,7 @@ const PilotPage = () => {
                             <CardContent>
                                 <div className="flex items-center space-x-1 mb-2">
                                     <Star className="h-4 w-4 text-yellow-400" />
-                                    <span>{ pilot.rating == 0 ? "No review yet" : pilot.rating }</span>
+                                    <span>{ pilot.rating === 0 ? "No review yet" : pilot.rating }</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {pilot.specialties.map((specialty, index) => (
