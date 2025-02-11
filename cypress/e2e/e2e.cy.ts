@@ -38,4 +38,33 @@ describe('PilotPage', () => {
       expect(str).to.contain('Booked');
     });
   });
+
+  it('allows deleting a pilot', () => {
+    cy.get('.grid').children().should('have.length', 10);
+
+    cy.get('.grid')
+        .children()
+        .first()
+        .find('button')
+        .find('svg') // Sucht nach dem Icon
+        .click();
+
+    cy.get('button').contains('Delete').click();
+
+    cy.get('.grid').children().should('have.length', 9);
+  });
+
+  it('adds a new pilot', () => {
+    cy.contains('Add User').click();
+
+    cy.get('input#name').type('Test Pilot');
+    cy.get('input#location').type('Test City');
+    cy.get('input#specialties').type('Aerial Photography, Cinematography');
+
+    cy.contains('Add User').click();
+
+    cy.get('.grid').should('contain', 'Test Pilot');
+    cy.get('.grid').should('contain', 'Test City');
+    cy.get('.grid').should('contain', 'Aerial Photography');
+  });
 });
