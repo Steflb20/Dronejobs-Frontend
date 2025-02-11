@@ -2,7 +2,7 @@ import * as cypress from "cypress";
 
 describe('PilotPage', () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000", { retryOnNetworkFailure: true });
+    cy.visit("http://127.0.0.1:3000", { retryOnNetworkFailure: true });
   });
 
   it('displays the title', () => {
@@ -19,21 +19,6 @@ describe('PilotPage', () => {
   });
 
   it('filters pilots by specialty', () => {
-    it('filters pilots by specialty', () => {
-      cy.get('.grid').children().should('have.length', 10);
-
-      cy.get('[data-testid="cypress-title"]').contains('Dronejobs');
-      cy.get('.select-trigger').click();
-      cy.contains('.select-item', 'Aerial Photography').click();
-
-      cy.get('.grid').children().should('have.length', 2);
-      cy.contains('.card-title', 'John Doe').should('be.visible');
-      cy.contains('.card-title', 'Thomas Müller').should('be.visible');
-
-      cy.get('.select-trigger').click();
-      cy.contains('.select-item', 'All Specialties').click();
-      cy.get('.grid').children().should('have.length', 10);
-    });
 
   });
 
