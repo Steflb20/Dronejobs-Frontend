@@ -19,6 +19,7 @@ services:
     image: cypress/included:13.15.2
     depends_on:
       - web
+
     environment:
       - CYPRESS_BASE_URL=http://web:3000
     volumes:

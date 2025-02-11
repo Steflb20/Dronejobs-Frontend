@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+'use client';
+
+import * as React from 'react';
 import {Button} from "../components/shadcn/button";
-import {MapPin, Star, User} from "lucide-react";
+import { MapPin, Star, User, Plus, Trash2 } from 'lucide-react';
 import {Input} from "../components/shadcn/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../components/shadcn/select";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../components/shadcn/card";
@@ -15,6 +17,8 @@ import {
     DialogTrigger
 } from "../components/shadcn/dialog";
 import {Calendar} from "../components/shadcn/calendar";
+import { useState } from 'react';
+import { Label } from "../components/shadcn/label";
 
 interface Pilot {
     id: number;
@@ -25,7 +29,7 @@ interface Pilot {
     imageUrl: string;
 }
 
-const dronePilots: Pilot[] = [
+const initialDronePilots: Pilot[] = [
     { id: 1, name: "John Doe", location: "New York", rating: 4.8, specialties: ["Aerial Photography", "Surveying"], imageUrl: "/placeholder.svg" },
     { id: 2, name: "Jane Smith", location: "Los Angeles", rating: 4.9, specialties: ["Real Estate", "Cinematography"], imageUrl: "/placeholder.svg" },
     { id: 3, name: "Mike Johnson", location: "Chicago", rating: 4.7, specialties: ["Inspection", "Mapping"], imageUrl: "/placeholder.svg" },
@@ -39,16 +43,57 @@ const dronePilots: Pilot[] = [
 ];
 
 const PilotPage = () => {
-
+    const [dronePilots, setDronePilots] = useState<Pilot[]>(initialDronePilots);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedSpecialty, setSelectedSpecialty] = useState<string>("all");
     const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
-    const [bookingDate, setBookingDate] = useState<Date | undefined>(undefined); // Change here
+    const [bookingDate, setBookingDate] = useState<Date | undefined>(undefined);
+
+    const [newUser, setNewUser] = useState<Omit<Pilot, 'id'>>({
+        name: "",
+        location: "",
+        rating: 0,
+        specialties: [],
+        imageUrl: "/placeholder.svg"
+    });
+    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [pilotToDelete, setPilotToDelete] = useState<Pilot | null>(null);
 
     const filteredPilots = dronePilots.filter(pilot =>
         pilot.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedSpecialty === "all" || pilot.specialties.includes(selectedSpecialty))
     );
+
+    const handleAddUser = () => {
+        const newPilot: Pilot = {
+            ...newUser,
+            id: dronePilots.length + 1,
+            specialties: newUser.specialties.filter(s => s !== ""),
+        };
+        setDronePilots([...dronePilots, newPilot]);
+        setNewUser({
+            name: "",
+            location: "",
+            rating: 0,
+            specialties: [],
+            imageUrl: "/placeholder.svg"
+        });
+        setIsAddUserDialogOpen(false);
+    };
+
+    const handleDeletePilot = (pilot: Pilot) => {
+        setPilotToDelete(pilot);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const confirmDeletePilot = () => {
+        if (pilotToDelete) {
+            setDronePilots(dronePilots.filter(p => p.id !== pilotToDelete.id));
+            setIsDeleteDialogOpen(false);
+            setPilotToDelete(null);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -57,10 +102,70 @@ const PilotPage = () => {
                     <div className="flex items-center space-x-2">
                         <span className="text-xl font-bold" data-testid="cypress-title">Dronejobs</span>
                     </div>
-                    <Button variant="ghost" className="flex items-center space-x-2">
-                        <User className="h-5 w-5" />
-                        <span>Profile</span>
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                        <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="flex items-center space-x-2">
+                                    <Plus className="h-5 w-5" />
+                                    <span>Add User</span>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Add New User</DialogTitle>
+                                    <DialogDescription>
+                                        Enter the details of the new drone pilot.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="name" className="text-right">
+                                            Name
+                                        </Label>
+                                        <Input
+                                            id="name"
+                                            value={newUser.name}
+                                            onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                                            className="col-span-3"
+                                            required={true}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="location" className="text-right">
+                                            Location
+                                        </Label>
+                                        <Input
+                                            id="location"
+                                            value={newUser.location}
+                                            onChange={(e) => setNewUser({...newUser, location: e.target.value})}
+                                            className="col-span-3"
+                                            required={true}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="specialties" className="text-right">
+                                            Specialties
+                                        </Label>
+                                        <Input
+                                            id="specialties"
+                                            value={newUser.specialties.join(", ")}
+                                            onChange={(e) => setNewUser({...newUser, specialties: e.target.value.split(", ")})}
+                                            className="col-span-3"
+                                            placeholder="Separate with commas"
+                                            required={true}
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button onClick={handleAddUser}>Add User</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                        <Button variant="ghost" className="flex items-center space-x-2">
+                            <User className="h-5 w-5" />
+                            <span>Profile</span>
+                        </Button>
+                    </div>
                 </div>
             </header>
 
@@ -93,24 +198,29 @@ const PilotPage = () => {
                     {filteredPilots.map((pilot) => (
                         <Card key={pilot.id}>
                             <CardHeader>
-                                <div className="flex items-center space-x-4">
-                                    <Avatar>
-                                        <AvatarImage src={pilot.imageUrl} alt={pilot.name} />
-                                        <AvatarFallback>{pilot.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <CardTitle>{pilot.name}</CardTitle>
-                                        <CardDescription className="flex items-center">
-                                            <MapPin className="h-4 w-4 mr-1" />
-                                            {pilot.location}
-                                        </CardDescription>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <Avatar>
+                                            <AvatarImage src={pilot.imageUrl} alt={pilot.name} />
+                                            <AvatarFallback>{pilot.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <CardTitle>{pilot.name}</CardTitle>
+                                            <CardDescription className="flex items-center">
+                                                <MapPin className="h-4 w-4 mr-1" />
+                                                {pilot.location}
+                                            </CardDescription>
+                                        </div>
                                     </div>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDeletePilot(pilot)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </CardHeader>
                             <CardContent>
                                 <div className="flex items-center space-x-1 mb-2">
                                     <Star className="h-4 w-4 text-yellow-400" />
-                                    <span>{pilot.rating}</span>
+                                    <span>{ pilot.rating == 0 ? "No review yet" : pilot.rating }</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {pilot.specialties.map((specialty, index) => (
@@ -154,6 +264,21 @@ const PilotPage = () => {
                     ))}
                 </div>
             </main>
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete {pilotToDelete?.name}? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
+                        <Button variant="destructive" onClick={confirmDeletePilot}>Delete</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
