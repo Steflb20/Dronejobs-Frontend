@@ -1,24 +1,32 @@
 'use client';
 
 import * as React from 'react';
-import {Button} from "../components/shadcn/button";
-import { MapPin, Star, User, Plus, Trash2 } from 'lucide-react';
-import {Input} from "../components/shadcn/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../components/shadcn/select";
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../components/shadcn/card";
-import {Avatar, AvatarFallback, AvatarImage} from "../components/shadcn/avatar";
-import {Badge} from "../components/shadcn/badge";
+import { Button } from "../components/shadcn/button";
+import { MapPin, Star, User, Plus, Trash2, CalendarIcon } from 'lucide-react';
+import { Input } from "../components/shadcn/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/shadcn/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/shadcn/card";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/shadcn/avatar";
+import { Badge } from "../components/shadcn/badge";
 import {
     Dialog,
     DialogContent,
-    DialogDescription, DialogFooter,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
 } from "../components/shadcn/dialog";
-import {Calendar} from "../components/shadcn/calendar";
-import { useState } from 'react';
+import { Calendar } from "../components/shadcn/calendar";
+import {useEffect, useState} from 'react';
 import { Label } from "../components/shadcn/label";
+import { format } from 'date-fns';
+
+interface Booking {
+    id: number;
+    date: Date;
+    pilotId: number;
+}
 
 interface Pilot {
     id: number;
@@ -48,6 +56,8 @@ const PilotPage = () => {
     const [selectedSpecialty, setSelectedSpecialty] = useState<string>("all");
     const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
     const [bookingDate, setBookingDate] = useState<Date | undefined>(undefined);
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [bookingConfirmation, setBookingConfirmation] = useState<string | null>(null);
 
     const [newUser, setNewUser] = useState<Omit<Pilot, 'id'>>({
         name: "",
@@ -59,6 +69,18 @@ const PilotPage = () => {
     const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [pilotToDelete, setPilotToDelete] = useState<Pilot | null>(null);
+    const [isBookingsDialogOpen, setIsBookingsDialogOpen] = useState(false);
+    const [selectedPilotBookings, setSelectedPilotBookings] = useState<Pilot | null>(null);
+
+    useEffect(() => {
+        if (bookingConfirmation) {
+            const timer = setTimeout(() => {
+                setBookingConfirmation(null);
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [bookingConfirmation]);
 
     const filteredPilots = dronePilots.filter(pilot =>
         pilot.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -90,9 +112,29 @@ const PilotPage = () => {
     const confirmDeletePilot = () => {
         if (pilotToDelete) {
             setDronePilots(dronePilots.filter(p => p.id !== pilotToDelete.id));
+            setBookings(bookings.filter(b => b.pilotId !== pilotToDelete.id));
             setIsDeleteDialogOpen(false);
             setPilotToDelete(null);
         }
+    };
+
+    const handleBooking = () => {
+        if (selectedPilot && bookingDate) {
+            const newBooking: Booking = {
+                id: bookings.length + 1,
+                date: bookingDate,
+                pilotId: selectedPilot.id
+            };
+            setBookings([...bookings, newBooking]);
+            setBookingConfirmation(`You have booked ${selectedPilot.name} for ${format(bookingDate, 'MMMM dd, yyyy')}`);
+            setBookingDate(undefined);
+            setSelectedPilot(null);
+        }
+    };
+
+    const handleViewBookings = (pilot: Pilot) => {
+        setSelectedPilotBookings(pilot);
+        setIsBookingsDialogOpen(true);
     };
 
     return (
@@ -170,6 +212,11 @@ const PilotPage = () => {
             </header>
 
             <main className="container mx-auto px-4 py-8">
+                {bookingConfirmation && (
+                    <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
+                        {bookingConfirmation}
+                    </div>
+                )}
                 <div className="mb-8 flex space-x-4">
                     <Input
                         type="text"
@@ -220,7 +267,7 @@ const PilotPage = () => {
                             <CardContent>
                                 <div className="flex items-center space-x-1 mb-2">
                                     <Star className="h-4 w-4 text-yellow-400" />
-                                    <span>{ pilot.rating == 0 ? "No review yet" : pilot.rating }</span>
+                                    <span>{ pilot.rating === 0 ? "No review yet" : pilot.rating }</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {pilot.specialties.map((specialty, index) => (
@@ -228,37 +275,34 @@ const PilotPage = () => {
                                     ))}
                                 </div>
                             </CardContent>
-                            <CardFooter>
+                            <CardFooter className="flex justify-between">
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button className="w-full" onClick={() => setSelectedPilot(pilot)}>Book Now</Button>
+                                        <Button className="flex-1 mr-2" onClick={() => setSelectedPilot(pilot)}>Book Now</Button>
                                     </DialogTrigger>
-                                    <DialogContent className={"w-1/4 mx-auto"}>
+                                    <DialogContent className="w-1/4 mx-auto">
                                         <DialogHeader>
                                             <DialogTitle>Book {selectedPilot?.name}</DialogTitle>
                                             <DialogDescription>
                                                 Select a date to book this drone pilot for your project.
                                             </DialogDescription>
                                         </DialogHeader>
-                                        <div className="py-4 mx-auto">
+                                        <div className="py-4">
                                             <Calendar
                                                 mode="single"
                                                 selected={bookingDate}
                                                 onSelect={(date) => setBookingDate(date)}
-                                                className="rounded-md border border-gray-300 shadow-lg p-4"
+                                                className="rounded-md border mx-auto w-2/3"
                                             />
                                         </div>
                                         <DialogFooter>
-                                            <Button onClick={() => {
-                                                if (selectedPilot && bookingDate) {
-                                                    alert(`Booked ${selectedPilot.name} for ${bookingDate.toDateString()}`);
-                                                }
-                                            }}>
-                                                Confirm Booking
-                                            </Button>
+                                            <Button onClick={handleBooking}>Confirm Booking</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
+                                <Button variant="outline" className="flex-1" onClick={() => handleViewBookings(pilot)}>
+                                    <CalendarIcon className="mr-2 h-4 w-4" /> View Bookings
+                                </Button>
                             </CardFooter>
                         </Card>
                     ))}
@@ -276,6 +320,31 @@ const PilotPage = () => {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
                         <Button variant="destructive" onClick={confirmDeletePilot}>Delete</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isBookingsDialogOpen} onOpenChange={setIsBookingsDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Bookings for {selectedPilotBookings?.name}</DialogTitle>
+                        <DialogDescription>
+                            Here are all the bookings for this pilot.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        {bookings.filter(b => b.pilotId === selectedPilotBookings?.id).length > 0 ? (
+                            bookings.filter(b => b.pilotId === selectedPilotBookings?.id).map(booking => (
+                                <div key={booking.id} className="mb-2">
+                                    {format(booking.date, 'MMMM dd, yyyy')}
+                                </div>
+                            ))
+                        ) : (
+                            <p>No bookings for this pilot yet.</p>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={() => setIsBookingsDialogOpen(false)}>Close</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
