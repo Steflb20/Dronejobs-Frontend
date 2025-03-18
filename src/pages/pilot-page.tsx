@@ -142,7 +142,7 @@ const PilotPage = () => {
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold" data-testid="cypress-title">Dronejobs Test PR TEST</span>
+                        <span className="text-xl font-bold" data-testid="cypress-title">Dronejobs Test PR  NUMMER X</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
