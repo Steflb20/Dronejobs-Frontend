@@ -21,6 +21,7 @@ import { Calendar } from "../components/shadcn/calendar";
 import {useEffect, useState} from 'react';
 import { Label } from "../components/shadcn/label";
 import { format } from 'date-fns';
+import axios from "axios";
 
 interface Booking {
     id: number;
@@ -72,6 +73,40 @@ const PilotPage = () => {
     const [isBookingsDialogOpen, setIsBookingsDialogOpen] = useState(false);
     const [selectedPilotBookings, setSelectedPilotBookings] = useState<Pilot | null>(null);
 
+    /*useEffect(() => {
+        axios.get("http://localhost:5000/api/dronepilot/all")
+            .then(result => {
+                console.log(result.data);
+                setDronePilots(result.data);
+
+            })
+    }, []);*/
+
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/dronepilot/all")
+            .then(result => {
+                console.log("Received data:", result.data);
+
+                // Transformiere die Daten so, dass specialties ein string[] ist
+                const transformedPilots: Pilot[] = result.data.map((pilot: any) => ({
+                    id: pilot.id,
+                    name: pilot.name,
+                    location: pilot.location,
+                    rating: pilot.rating,
+                    specialties: pilot.specialties.map((s: any) => s.name), // Nur den Namen extrahieren
+                    imageUrl: pilot.imageUrl || "/placeholder.svg" // Falls kein Bild vorhanden ist
+                }));
+
+                setDronePilots(transformedPilots);
+            })
+            .catch(error => {
+                console.error("Error fetching drone pilots:", error);
+            });
+    }, []);
+
+
+
+
     useEffect(() => {
         if (bookingConfirmation) {
             const timer = setTimeout(() => {
@@ -87,7 +122,7 @@ const PilotPage = () => {
         (selectedSpecialty === "all" || pilot.specialties.includes(selectedSpecialty))
     );
 
-    const handleAddUser = () => {
+    /*const handleAddUser = () => {
         const newPilot: Pilot = {
             ...newUser,
             id: dronePilots.length + 1,
@@ -102,21 +137,103 @@ const PilotPage = () => {
             imageUrl: "/placeholder.svg"
         });
         setIsAddUserDialogOpen(false);
+    };*/
+
+    /*const handleAddUser = () => {
+        axios.post("http://localhost:5000/api/dronepilot/save", {
+            "aboutMe": "",
+            "name": newUser.name,
+            "location": newUser.location,
+            "rating": 0,
+            "specialties": newUser.specialties
+        })
+            .then(response => {
+                console.log("User added:", response.data);
+
+                // Neuen Piloten zur Liste hinzufügen
+                setDronePilots([...dronePilots, response.data]);
+
+                // Eingabeformular zurücksetzen
+                setNewUser({
+                    name: "",
+                    location: "",
+                    rating: 0,
+                    specialties: [],
+                    imageUrl: "/placeholder.svg"
+                });
+
+                setIsAddUserDialogOpen(false);
+            })
+            .catch(error => {
+                console.error("Error adding user:", error);
+            });
+    };*/
+
+    const handleAddUser = () => {
+        axios.post("http://localhost:5000/api/dronepilot/save", newUser)
+            .then(response => {
+                console.log("User added:", response.data);
+
+                // Falls specialties ein Array von Objekten ist, nur die Namen extrahieren
+                const newPilot: Pilot = {
+                    id: response.data.id,
+                    name: response.data.name,
+                    location: response.data.location,
+                    rating: response.data.rating,
+                    specialties: response.data.specialties.map((s: any) => typeof s === "string" ? s : s.name),
+                    imageUrl: response.data.imageUrl || "/placeholder.svg"
+                };
+
+                setDronePilots([...dronePilots, newPilot]);
+                setNewUser({
+                    name: "",
+                    location: "",
+                    rating: 0,
+                    specialties: [],
+                    imageUrl: "/placeholder.svg"
+                });
+
+                setIsAddUserDialogOpen(false);
+            })
+            .catch(error => {
+                console.error("Error adding user:", error);
+            });
     };
+
+
 
     const handleDeletePilot = (pilot: Pilot) => {
         setPilotToDelete(pilot);
         setIsDeleteDialogOpen(true);
     };
 
-    const confirmDeletePilot = () => {
+    /*const confirmDeletePilot = () => {
         if (pilotToDelete) {
             setDronePilots(dronePilots.filter(p => p.id !== pilotToDelete.id));
             setBookings(bookings.filter(b => b.pilotId !== pilotToDelete.id));
             setIsDeleteDialogOpen(false);
             setPilotToDelete(null);
         }
+    };*/
+
+    const confirmDeletePilot = () => {
+        if (pilotToDelete) {
+            axios.delete(`http://localhost:5000/api/dronepilot/deleteById/${pilotToDelete.id}`)
+                .then(() => {
+                    console.log(`Pilot mit ID ${pilotToDelete.id} gelöscht`);
+
+                    // Nach erfolgreicher Löschung im Backend auch aus dem State entfernen
+                    setDronePilots(dronePilots.filter(p => p.id !== pilotToDelete.id));
+                    setBookings(bookings.filter(b => b.pilotId !== pilotToDelete.id));
+                    setIsDeleteDialogOpen(false);
+                    setPilotToDelete(null);
+                })
+                .catch(error => {
+                    console.error("Fehler beim Löschen des Piloten:", error);
+                });
+        }
     };
+
 
     const handleBooking = () => {
         if (selectedPilot && bookingDate) {
@@ -234,8 +351,8 @@ const PilotPage = () => {
                             <SelectItem value="Aerial Photography">Aerial Photography</SelectItem>
                             <SelectItem value="Surveying">Surveying</SelectItem>
                             <SelectItem value="Real Estate">Real Estate</SelectItem>
-                            <SelectItem value="Cinematography">Cinematography</SelectItem>
-                            <SelectItem value="Inspection">Inspection</SelectItem>
+                            <SelectItem value="Cinematography">Cinematic</SelectItem>
+                            <SelectItem value="Inspection">FPV</SelectItem>
                             <SelectItem value="Mapping">Mapping</SelectItem>
                         </SelectContent>
                     </Select>
