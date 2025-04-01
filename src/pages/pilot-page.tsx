@@ -83,7 +83,7 @@ const PilotPage = () => {
     }, []);*/
 
     useEffect(() => {
-        axios.get("http://localhost:5000/api/dronepilot/all")
+        axios.get("https://api.kadrone1.uber.space/api/dronepilot/all")
             .then(result => {
                 console.log("Received data:", result.data);
 
@@ -170,7 +170,7 @@ const PilotPage = () => {
     };*/
 
     const handleAddUser = () => {
-        axios.post("http://localhost:5000/api/dronepilot/save", newUser)
+        axios.post("https://api.kadrone1.uber.space/api/dronepilot/save", newUser)
             .then(response => {
                 console.log("User added:", response.data);
 
@@ -218,7 +218,7 @@ const PilotPage = () => {
 
     const confirmDeletePilot = () => {
         if (pilotToDelete) {
-            axios.delete(`http://localhost:5000/api/dronepilot/deleteById/${pilotToDelete.id}`)
+            axios.delete(`https://api.kadrone1.uber.space/api/dronepilot/deleteById/${pilotToDelete.id}`)
                 .then(() => {
                     console.log(`Pilot mit ID ${pilotToDelete.id} gelöscht`);
 
